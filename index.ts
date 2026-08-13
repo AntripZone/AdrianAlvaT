@@ -12,7 +12,7 @@ console.log(systemName + " v"+version+version1);
 console.log("Bienvenido, "+userName);
 console.log("==============================");
 */
-const answer = await rl.question("¿Cuál es tu nombre?: ");
+/*const answer = await rl.question("¿Cuál es tu nombre?: ");
 console.log(`Hola, ${answer}!`);
 const tareas: string[] = [];
 let opcion : number;
@@ -57,8 +57,79 @@ switch (opcion) {
   break;
   }
 } while (opcion !== 4);
+*/
+interface Task {
+  id: number;
+  title: string;
+  completed: boolean;   // '?' = propiedad opcional
+}
 
+const tareas: Task[] = [];
+let contador = 1;
 
+const addTask  = (title: string): void => {
+  const nuevaTask: Task = {
+    id: contador,
+    title,
+    completed: false
+  };
+  tareas.push(nuevaTask);
+  contador++;
+  console.log(`Tarea ${nuevaTask.title} agregada con id ${nuevaTask.id}.`);
+};
 
+const listTasks  = (): void => {
+  if(tareas.length == 0){
+    console.log("No hay tareas registradas");
+    return;
+  }
+  for(let i = 0; i < tareas.length; i++){
+    const t = tareas[i];
+    console.log(`[${t.id}] ${t.title} - ${t.completed ? "completado" : "pendiente"}`);
+  }
+};
+
+const removeTask = (): void => {
+    const eliminar = tareas.pop();
+    if (eliminar) {
+        console.log(`Tarea eliminada: "${eliminar.title}"`);
+    } else {
+        console.log("No hay tareas para eliminar");
+    }
+};
+
+let opcion: number;
+
+do {
+    const menu = `
+    --- GESTOR DE TAREAS ---
+    1.Agregar Tarea
+    2.Eliminar ultima tarea
+    3.Listar tareas
+    4.Salir
+`;
+    console.log(menu);
+    opcion = Number(await rl.question("Elige una opción: "));
+
+    switch (opcion) {
+        case 1: {
+            const title = await rl.question("Título de la tarea: ");
+            addTask(title);
+            break;
+        }
+        case 2:
+            removeTask();
+            break;
+        case 3:
+            listTasks();
+            break;
+        case 4:
+            console.log("Saliendo...");
+            break;
+        default:
+            console.log("Opcion no valida");
+            break;
+    }
+} while (opcion !== 4);
 
 rl.close();
