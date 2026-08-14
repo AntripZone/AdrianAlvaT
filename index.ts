@@ -58,10 +58,10 @@ switch (opcion) {
   }
 } while (opcion !== 4);
 */
-interface Task {
+/*interface Task {
   id: number;
   title: string;
-  completed: boolean;   // '?' = propiedad opcional
+  completed: boolean;
 }
 
 const tareas: Task[] = [];
@@ -131,5 +131,117 @@ do {
             break;
     }
 } while (opcion !== 4);
+*/
+interface Task {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+const tarea: Task[] = [];
+let idContador = 1;
+
+const addTask = (title: string): void => {
+    const newTask: Task = {
+        id: idContador,
+        title,
+        completed: false,
+    };
+    tarea.push(newTask);
+    idContador++;
+    console.log(`Tarea "${newTask.title}" agregada con id ${newTask.id}`);
+};
+
+const removeTask = (): void => {
+    const removed = tarea.pop();
+    if (removed) {
+        console.log(`Tarea eliminada: "${removed.title}"`);
+    } else {
+        console.log("No hay tareas para eliminar");
+    }
+};
+
+const markCompleted = (id: number): void => {
+    const task = tarea.find((idTarea) => idTarea.id === id);
+    if (task) {
+        task.completed = true;
+        console.log(`Tarea "${task.title}" marcada como completada.`);
+    } else {
+        console.log(`No se encontró ninguna tarea con id ${id}.`);
+    }
+};
+
+const filterPending = (): Task[] => {
+    return tarea.filter(({ completed }) => !completed);
+};
+
+const filterCompleted = (): Task[] => {
+    return tarea.filter(({ completed }) => completed);
+};
+
+const imprimirTasks = (taskLista: Task[]): void => {
+    if (taskLista.length === 0) {
+        console.log("No hay tareas para mostrar");
+        return;
+    }
+
+    const formatear = taskLista.map((tarea) => {
+        const { id, title, completed } = tarea;
+        return `${id}. ${title} -> ${completed ? "completed" : "pending"}`;
+    });
+
+    formatear.forEach((lista) => console.log(lista));
+};
+
+const listTasks = (): void => {
+    imprimirTasks(tarea);
+};
+
+let opcion: number;
+
+do {
+    const menu = `
+    --- GESTOR DE TAREAS ---
+    1.Agregar Tarea
+    2.Eliminar ultima tarea
+    3.Listar tareas
+    4. Marcar tarea como completada
+    5. Ver tareas pendientes
+    6. Ver tareas completadas
+    7.Salir
+`;
+    console.log(menu);
+    opcion = Number(await rl.question("Elige una opción: "));
+
+    switch (opcion) {
+        case 1: {
+            const title = await rl.question("Título de la tarea: ");
+            addTask(title);
+            break;
+        }
+        case 2:
+            removeTask();
+            break;
+        case 3:
+            listTasks();
+            break;
+        case 4:
+            const id = Number (await rl.question("Ingrese el id de la tarea que quiere completar: "));
+            markCompleted(id);
+            break;
+        case 5:
+            imprimirTasks(filterPending());
+            break;
+        case 6:
+            imprimirTasks(filterCompleted());
+            break;
+        case 7:
+            console.log("Saliendo...");
+            break;
+        default:
+            console.log("Opcion no valida");
+            break;
+    }
+} while (opcion !== 7);
 
 rl.close();
