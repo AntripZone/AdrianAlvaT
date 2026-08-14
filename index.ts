@@ -132,6 +132,7 @@ do {
     }
 } while (opcion !== 4);
 */
+/*
 interface Task {
   id: number;
   title: string;
@@ -243,5 +244,112 @@ do {
             break;
     }
 } while (opcion !== 7);
+*/
+
+interface Task {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+const tareas: Task[] = [];
+let contador = 1;
+
+const saveToDB = (tareas: Task): Promise<void> => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            console.log(`Tarea "${tareas.title}" guardada en la BD.`);
+            resolve();
+        }, 2000);
+    });
+};
+
+const addTask = async (title: string): Promise<void> => {
+    try {
+        if (title.trim() === "") { //Remuevo los espacios
+            throw new Error("El título de la tarea no puede estar vacío.");
+        }
+
+        const nuevaTarea: Task = {
+            id: contador,
+            title,
+            completed: false,
+        };
+
+        await saveToDB(nuevaTarea);
+
+        tareas.push(nuevaTarea);
+        contador++;
+        console.log(`Tarea "${nuevaTarea.title}" agregada con id ${nuevaTarea.id}.`);
+    } catch (error) {
+        if (error instanceof Error) {
+            console.log(`Error: ${error.message}`);
+        }
+    }
+};
+
+const removeTask = (id: number): void => {
+    const idTarea = tareas.findIndex((tarea) => tarea.id == id)
+    if (idTarea == -1) {
+        console.log(`No se encontró una tarea con el id ${idTarea}`);
+        return;
+    }
+    const [removed] = tareas.splice(idTarea, 1);
+    console.log(`Tarea eliminada: ${removed.title} con el id: ${removed.id}`);
+};
+
+const imprimirTasks = (taskList: Task[]): void => {
+    if (taskList.length === 0) {
+        console.log("No hay tareas para mostrar.");
+        return;
+    }
+
+    const formatted = taskList.map((task) => {
+        const { id, title, completed } = task;
+        return `[${id}] ${title} - ${completed ? "completed" : "pending"}`;
+    });
+
+    formatted.forEach((line) => console.log(line));
+};
+
+const listTasks = (): void => {
+    imprimirTasks(tareas);
+};
+
+let opcion: number;
+
+do {
+    const menu = `
+    ===== GESTOR DE TAREAS =====
+    1. Agregar tarea
+    2. Eliminar tarea
+    3. Listar todas las tareas
+    4. Salir
+`;
+    console.log(menu);
+    opcion = Number(await rl.question("Elige una opción: "));
+
+    switch (opcion) {
+        case 1: {
+            const title = await rl.question("Título de la tarea: ");
+            await addTask(title);
+            break;
+        }
+        case 2:
+            const id = Number(await rl.question("Ingrese el id de la tarea para eliminar: "));
+            removeTask(id);
+            break;
+        case 3:
+            listTasks();
+            break;
+        case 4:
+            console.log("Saliendo del gestor de tareas...");
+            break;
+        default:
+            console.log("Opción no válida, intenta de nuevo.");
+            break;
+    }
+} while (opcion !== 4);
+
 
 rl.close();
